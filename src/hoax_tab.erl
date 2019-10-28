@@ -1,6 +1,6 @@
 -module(hoax_tab).
 
--compile([export_all]).
+-compile([export_all, nowarn_export_all]).
 
 -include_lib("stdlib/include/qlc.hrl").
 -include("hoax_int.hrl").
