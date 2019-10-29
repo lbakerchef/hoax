@@ -1,25 +1,21 @@
 -import(hoax, [mock/2, stub/3]).
 -include_lib("eunit/include/eunit.hrl").
 
--ifdef(HOAX_SUPPRESS_DEPRECATION_WARNING).
 -define(DEPRECATION_WARNING, warning_ignored).
--else.
--define(DEPRECATION_WARNING,
-    ?debugMsg("WARNING: HOAX_FIXTURE macros are deprecated. Write a generator function using hoax:fixture() instead.")
-).
--endif.
 
 -define(HOAX_FIXTURE(Setup, Teardown),
     hoax_fixture_test_() ->
-        ?DEPRECATION_WARNING,
-        hoax:fixture(?MODULE, Setup, Teardown)
+        {foreach,
+            fun() -> hoax:start(), Setup() end,
+            fun(X) -> Teardown(X), hoax:stop() end,
+            hoax_macro:test_list(?MODULE, Setup, Teardown)
+        }
 ).
 
 -define(HOAX_FIXTURE,
-    hoax_fixture_test_() ->
-        ?DEPRECATION_WARNING,
-        hoax:fixture(?MODULE)
+    ?HOAX_FIXTURE(fun() -> ok end, fun(_) -> ok end)
 ).
+
 
 -define(verifyAll,
     ((fun() ->
